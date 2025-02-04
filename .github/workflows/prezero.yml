@@ -27,7 +27,20 @@ jobs:
         pip install conan
         conan profile detect
 
-    - name: Run Conan Install
+    - name: Install vcpkg
+      run: |
+        git clone https://github.com/microsoft/vcpkg.git
+        ./vcpkg/bootstrap-vcpkg.sh
+        echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
+
+    - name: Configure Conan to use vcpkg
+      run: |
+        conan config set general.revisions_enabled=1
+        conan config set tools.system.package_manager:mode=install
+        conan config set tools.system.package_manager:tool=vcpkg
+        conan profile update settings.compiler.cppstd=17 default
+
+    - name: Run Conan Install with vcpkg
       run: |
         conan install . --build=missing
 
@@ -39,7 +52,7 @@ jobs:
       run: |
         ${GITHUB_WORKSPACE}/sl --version
         ${GITHUB_WORKSPACE}/sl analyze --strict --wait --verbose \
-          --app C-test \
+          --app C-test-App \
           --tag branch=${{ github.head_ref }} --c .
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
