@@ -33,6 +33,12 @@ jobs:
         ./vcpkg/bootstrap-vcpkg.sh
         echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
 
+    - name: Generate conanfile.txt from vcpkg
+      run: |
+        echo "[requires]" > conanfile.txt
+        ./vcpkg/vcpkg list | awk '{print $1"/latest"}' >> conanfile.txt
+        echo -e "\n[generators]\ncmake" >> conanfile.txt
+
     - name: Run Conan Install with vcpkg
       run: |
         conan install . --build=missing
@@ -45,7 +51,7 @@ jobs:
       run: |
         ${GITHUB_WORKSPACE}/sl --version
         ${GITHUB_WORKSPACE}/sl analyze --strict --wait --verbose \
-          --app C-testvcpkg \
+          --app C-test-App \
           --tag branch=${{ github.head_ref }} --c .
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
