@@ -41,7 +41,7 @@ jobs:
 
     - name: Run Conan Install with vcpkg
       run: |
-        conan install . --build=missing
+        conan install . --build=missing --output-folder=conan_build
 
     - name: Download ShiftLeft CLI
       run: |
