@@ -114,7 +114,7 @@ jobs:
               ${GITHUB_WORKSPACE}/sl --version
               ${GITHUB_WORKSPACE}/sl analyze --strict --wait \
               --app C-vcspkg-App \
-              --tag branch=${{ github.head_ref }} -- --compilation-database vcpkg.json\
+              --tag branch=${{ github.head_ref }} -- --compilation-database vcpkg.json \
         env:
            SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
           
