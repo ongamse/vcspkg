@@ -37,7 +37,7 @@ jobs:
       run: |
         echo "[requires]" > conanfile.txt
         ./vcpkg/vcpkg list | awk '{print $1"/latest"}' >> conanfile.txt
-        echo -e "\n[generators]\ncmake" >> conanfile.txt
+        echo -e "\n[generators]\nCMakeDeps\nCMakeToolchain" >> conanfile.txt
 
     - name: Run Conan Install with vcpkg
       run: |
