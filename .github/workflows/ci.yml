@@ -105,47 +105,16 @@ jobs:
           gcovr: 7.2
           opencppcoverage: true
 
-      - name: Initialize CodeQL
-        if: ${{ contains(matrix.os, 'ubuntu') && contains(matrix.compiler, 'llvm') }}
-        uses: github/codeql-action/init@v3
-        with:
-          languages: "cpp"
-
-      - name: Test/Coverage
+      - name: Download QwietAI CLI
         run: |
-          task coverage
-        env:
-          CMAKE_GENERATOR: ${{matrix.CMAKE_GENERATOR}}
-          GCOV: ${{matrix.GCOV}}
+              curl https://cdn.shiftleft.io/download/sl > ${GITHUB_WORKSPACE}/sl && chmod a+rx ${GITHUB_WORKSPACE}/sl
 
-      - name: Test release
+      - name: preZero Static Analysis
         run: |
-          task test_release
+              ${GITHUB_WORKSPACE}/sl --version
+              ${GITHUB_WORKSPACE}/sl analyze --strict --wait \
+              --app C-vcspkg-App \
+              --tag branch=${{ github.head_ref }} \
         env:
-          CMAKE_GENERATOR: ${{matrix.CMAKE_GENERATOR}}
-          GCOV: ${{matrix.GCOV}}
-
-      - name: Install
-        run: |
-          task install
-        env:
-          CMAKE_GENERATOR: ${{matrix.CMAKE_GENERATOR}}
-          CPACK_GENERATOR: ${{matrix.CPACK_GENERATOR}}
-
-      - name: Perform CodeQL Analysis
-        if: ${{ contains(matrix.os, 'ubuntu') && contains(matrix.compiler, 'llvm') }}
-        uses: github/codeql-action/analyze@v3
-
-      - name: Publish Tagged Release
-        uses: softprops/action-gh-release@v2
-        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.CPACK_GENERATOR != '' }}
-        with:
-          files: |
-            build/*-*Release*-*.*
-
-      - name: Publish to codecov
-        uses: codecov/codecov-action@v4
-        with:
-          flags: ${{ runner.os }}
-          name: ${{ runner.os }}-coverage
-          files: ./build/coverage.xml
+           SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
+          
