@@ -11,28 +11,116 @@ on:
     #- cron: '0 11 * * 6'
 
 jobs:
-  NextGen-Static-Analysis:
-    runs-on: ubuntu-latest
+    Test:
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+
+      # Recommendations:
+      #   * support at least 2 operating systems
+      #   * support at least 2 compilers
+      #   * make sure all supported configurations for your project are built
+      #
+      # Disable/enable builds in this list to meet the above recommendations
+      # and your own projects needs
+      matrix:
+        os:
+          - ubuntu-22.04
+          - macos-13
+          - macos-14
+          - windows-2022
+        compiler:
+          # you can specify the version after `-` like "llvm-13.0.0".
+          - llvm
+          - gcc
+        CMAKE_GENERATOR:
+          - "Ninja Multi-Config"
+        CPACK_GENERATOR:
+          - ZIP
+
+        include:
+          # Inject GCOV variable for gcc
+          - compiler: gcc
+            GCOV: gcov
+          # Inject GCOV variable for llvm
+          - compiler: llvm
+            GCOV: "llvm-cov gcov"
+
+          # Only to test non-multiconfig builds
+          - os: ubuntu-22.04
+            compiler: gcc-11
+            CMAKE_GENERATOR: "Unix Makefiles"
+            GCOV: gcov-11
+
+          - os: windows-2022
+            compiler: msvc
+            CMAKE_GENERATOR: "Visual Studio 17 2022"
+
+          - os: macos-14
+            compiler: appleclang
+
+        # To exclude a specific job from the matrix (e.g llvm on macos-14), you can use this syntax.
+        exclude:
+          - os: macos-14
+            compiler: llvm
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup Java JDK v11
-      uses: actions/setup-java@v3
-      with:
+      - uses: actions/checkout@v4
+
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/vcpkg
+            ./build/vcpkg_installed
+            ${{ env.CONAN_USER_HOME }}
+            ~/.cache/pip
+            ${{ env.HOME }}/.cache/vcpkg/archives
+            ${{ env.XDG_CACHE_HOME }}/vcpkg/archives
+            ${{ env.LOCALAPPDATA }}\vcpkg\archives
+            ${{ env.APPDATA }}\vcpkg\archives
+          key: ${{ runner.os }}-${{ matrix.compiler }}-${{ hashFiles('./vcpkg.json')}}-${{ matrix.CMAKE_GENERATOR }}-${{ hashFiles('**/CMakeLists.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.compiler }}-${{ hashFiles('./vcpkg.json') }}-
+
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: ${{ matrix.compiler }}
+          vcvarsall: ${{ contains(matrix.os, 'windows' )}}
+
+          cmake: "3.28.4"
+          ninja: true
+          vcpkg: true
+          ccache: true
+          clangtidy: true
+          task: true
+
+          cppcheck: true
+
+          gcovr: 7.2
+          opencppcoverage: true
+  
+      - name: Setup Java JDK v11
+        uses: actions/setup-java@v3
+        with:
         distribution: zulu
         java-version: 11
+   
+      - name: Download QwietAI CLI
+        run: |
+          curl https://cdn.shiftleft.io/download/sl > ${GITHUB_WORKSPACE}/sl && chmod a+rx ${GITHUB_WORKSPACE}/sl
 
-    - name: CMAKE Install
-      run: sudo apt-get install cmake
-      
-    - name: Download QwietAI CLI
-      run: |
-        curl https://cdn.shiftleft.io/download/sl > ${GITHUB_WORKSPACE}/sl && chmod a+rx ${GITHUB_WORKSPACE}/sl
-
-    - name: preZero Static Analysis
-      run: |
-        ${GITHUB_WORKSPACE}/sl --version
-        ${GITHUB_WORKSPACE}/sl analyze --strict --wait \
+      - name: preZero Static Analysis
+        run: |
+          ${GITHUB_WORKSPACE}/sl --version
+          ${GITHUB_WORKSPACE}/sl analyze --strict --wait \
           --app C-vcspkg-App \
           --tag branch=${{ github.head_ref }} \
-      env:
+        env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
