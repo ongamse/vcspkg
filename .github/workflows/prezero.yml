@@ -35,7 +35,6 @@ jobs:
 
     - name: Configure Conan to use vcpkg (Conan v2)
       run: |
-        conan config install default
         conan profile update conf.tools.system.package_manager:mode=install default
         conan profile update conf.tools.system.package_manager:tool=vcpkg default
         conan profile update settings.compiler.cppstd=17 default
