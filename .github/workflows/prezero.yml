@@ -31,11 +31,11 @@ jobs:
         pip install conan
         conan profile detect
 
-    # Configure Conan Remotes with --force
+    # Configure Conan Remotes (removing bincrafters)
     - name: Configure Conan Remotes
       run: |
+        conan remote remove bincrafters || true
         conan remote add conancenter https://center.conan.io --force
-        conan remote add bincrafters https://bincrafters.jfrog.io/artifactory/api/conan/public-conan --force
         conan remote list
 
     # Install vcpkg
@@ -63,19 +63,20 @@ jobs:
     - name: Generate conanfile.txt from vcpkg
       run: |
         echo "[requires]" > conanfile.txt
-        ./vcpkg/vcpkg list | grep -v "fmt" | awk '{print $1"/latest"}' >> conanfile.txt
+        ./vcpkg/vcpkg list | awk '{print $1"/latest"}' >> conanfile.txt
         echo "fmt/10.1.1" >> conanfile.txt
         echo -e "\n[generators]\nCMakeDeps\nCMakeToolchain" >> conanfile.txt
 
-    # Manually install missing package (vcpkg-cmake-config)
+    # Install missing package (vcpkg-cmake-config) from conancenter
     - name: Install vcpkg-cmake-config manually
       run: |
-        conan install vcpkg-cmake-config/0.1@ --build=missing || echo "vcpkg-cmake-config already installed"
+        conan search vcpkg-cmake-config -r=conancenter || echo "Package not found in remote."
+        conan install vcpkg-cmake-config/0.1@ --build=missing -r=conancenter || echo "Skipping package install."
 
     # Run Conan Install with all dependencies
     - name: Run Conan Install
       run: |
-        conan install . --build=missing --output-folder=conan_build
+        conan install . --build=missing --output-folder=conan_build -r=conancenter
 
     # Install compiledb
     - name: Install compiledb
