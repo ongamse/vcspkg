@@ -21,10 +21,16 @@ jobs:
         pip install conan
         conan profile detect
 
+    - name: Install required build tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake g++ gcc
+
     - name: Install vcpkg
       run: |
         git clone https://github.com/microsoft/vcpkg.git
-        ./vcpkg/bootstrap-vcpkg.sh
+        cd vcpkg
+        ./bootstrap-vcpkg.sh
         echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
 
     - name: Generate conanfile.txt from vcpkg
@@ -34,11 +40,6 @@ jobs:
         # Explicitly add fmt with the required version
         echo "fmt/10.1.1" >> conanfile.txt
         echo -e "\n[generators]\nCMakeDeps\nCMakeToolchain" >> conanfile.txt
-
-    - name: Install required build tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake g++ gcc
 
     - name: Run Conan Install with vcpkg dependencies
       run: |
