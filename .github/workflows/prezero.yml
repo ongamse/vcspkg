@@ -106,9 +106,9 @@ jobs:
         compiledb make  # ✅ Explicitly generate compile_commands.json
 
     # Move compile_commands.json to root (if necessary)
-    - name: Move Compilation Database
-      run: |
-        cp build/compile_commands.json .
+    #- name: Move Compilation Database
+      #run: |
+      #  cp compile_commands.json .
 
     # Download ShiftLeft CLI
     - name: Download ShiftLeft CLI
