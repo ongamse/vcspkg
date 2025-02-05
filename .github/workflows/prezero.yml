@@ -33,9 +33,8 @@ jobs:
         chmod +x ./vcpkg/bootstrap-vcpkg.sh  # Ensure the script is executable
         ./vcpkg/bootstrap-vcpkg.sh          # Run the bootstrap script
         echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
-        # Install dependencies (classic mode)
-        ./vcpkg/vcpkg install zlib curl boost
-
+        # Install dependencies from manifest (no package names required)
+        ./vcpkg/vcpkg install
 
     - name: Generate conanfile.txt from vcpkg
       run: |
