@@ -31,14 +31,12 @@ jobs:
         pip install conan
         conan profile detect
 
-    # Configure Conan Remotes
+    # Configure Conan Remotes with --force
     - name: Configure Conan Remotes
       run: |
-        conan remote list || true
-        conan remote add conancenter https://center.conan.io || true
-        conan remote add bincrafters https://bincrafters.jfrog.io/artifactory/api/conan/public-conan || true
-        conan remote update conancenter https://center.conan.io
-        conan remote update bincrafters https://bincrafters.jfrog.io/artifactory/api/conan/public-conan
+        conan remote add conancenter https://center.conan.io --force
+        conan remote add bincrafters https://bincrafters.jfrog.io/artifactory/api/conan/public-conan --force
+        conan remote list
 
     # Install vcpkg
     - name: Install vcpkg
