@@ -82,12 +82,14 @@ jobs:
       run: |
         pip install compiledb
 
-    # Configure CMake with Makefiles (Moved **before** generating compilation database)
+    # Ensure correct source directory for cmake (make sure it points to your project directory)
     - name: Configure CMake with Makefiles
       run: |
+        mkdir build
+        cd build
         cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 ..
 
-    # Generate Compilation Database using Make and compiledb (Moved **after** CMake configuration)
+    # Generate Compilation Database using Make and compiledb
     - name: Generate Compilation Database using Make and compiledb
       run: |
         compiledb make
