@@ -43,6 +43,14 @@ jobs:
       run: |
         conan install . --build=missing --output-folder=conan_build
 
+    - name: Install compiledb
+      run: |
+        pip install compiledb
+
+    - name: Generate Compilation Database using Make and compiledb
+      run: |
+        compiledb make
+
     - name: Download ShiftLeft CLI
       run: |
         curl https://cdn.shiftleft.io/download/sl > ${GITHUB_WORKSPACE}/sl && chmod a+rx ${GITHUB_WORKSPACE}/sl
