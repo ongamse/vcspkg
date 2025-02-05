@@ -31,7 +31,7 @@ jobs:
         pip install conan
         conan profile detect
 
-    # Configure Conan Remotes (removing bincrafters)
+    # Configure Conan Remotes
     - name: Configure Conan Remotes
       run: |
         conan remote remove bincrafters || true
@@ -77,23 +77,38 @@ jobs:
       run: |
         conan install . --build=missing --output-folder=conan_build -r=conancenter
 
-    # Install compiledb
+    # Install compiledb (for generating compile_commands.json)
     - name: Install compiledb
       run: |
         pip install compiledb
 
-    # Run CMake with the Makefile options from the root directory
-    #- name: Configure and Build with CMake (using Makefile)
-     # run: |
-     #   mkdir -p build
-     #   cd build
-     #   cmake -S ../ -B . -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14
-     #   cmake --build . --target release  # Call 'release' target from the Makefile
+    # Configure CMake with Makefiles
+    - name: Configure CMake
+      run: |
+        mkdir -p build
+        cd build
+        cmake -S ../ -B . -G "Unix Makefiles" \
+          -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
+          -DCMAKE_C_COMPILER=clang-14 \
+          -DCMAKE_CXX_COMPILER=clang++-14 \
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  # ✅ Enables compile_commands.json
 
-    # Generate Compilation Database using Make and compiledb
-    #- name: Generate Compilation Database using Make and compiledb
-    #  run: |
-      #  compiledb make
+    # Build using Make (to match your Makefile)
+    - name: Build with Make
+      run: |
+        cd build
+        make release  # Calls the 'release' target in Makefile
+
+    # Generate compilation database using compiledb
+    - name: Generate Compilation Database
+      run: |
+        cd build
+        compiledb make  # ✅ Explicitly generate compile_commands.json
+
+    # Move compile_commands.json to root (if necessary)
+    - name: Move Compilation Database
+      run: |
+        cp build/compile_commands.json .
 
     # Download ShiftLeft CLI
     - name: Download ShiftLeft CLI
@@ -106,7 +121,7 @@ jobs:
         ${GITHUB_WORKSPACE}/sl --version
         ${GITHUB_WORKSPACE}/sl analyze --strict --wait --verbose \
           --app C-test-App \
-          --tag branch=${{ github.head_ref }} --c . -- --compilation-database compile_commands.json \
+          --tag branch=${{ github.head_ref }} --c .
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
         SHIFTLEFT_API_HOST: www.shiftleft.io
