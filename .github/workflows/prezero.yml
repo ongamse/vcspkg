@@ -33,7 +33,7 @@ jobs:
         chmod +x ./vcpkg/bootstrap-vcpkg.sh  # Ensure the script is executable
         ./vcpkg/bootstrap-vcpkg.sh          # Run the bootstrap script
         echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
-        # Install dependencies using vcpkg manifest mode (vcpkg.json)
+        # Install dependencies (manifest mode)
         ./vcpkg/vcpkg install --manifest $GITHUB_WORKSPACE/vcpkg.json
 
 
