@@ -83,16 +83,16 @@ jobs:
         pip install compiledb
 
     # Ensure correct source directory for cmake (make sure it points to your project directory)
-    - name: Configure CMake with Makefiles
-      run: |
-        mkdir build
-        cd build
-        cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 ..
+    #- name: Configure CMake with Makefiles
+     # run: |
+      #  mkdir build
+      #  cd build
+       # cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 ..
 
     # Generate Compilation Database using Make and compiledb
-    - name: Generate Compilation Database using Make and compiledb
-      run: |
-        compiledb make
+    #- name: Generate Compilation Database using Make and compiledb
+      #run: |
+       # compiledb make
 
     # Download ShiftLeft CLI
     - name: Download ShiftLeft CLI
