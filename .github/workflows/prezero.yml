@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Setup Java JDK v11
       uses: actions/setup-java@v3
       with:
@@ -51,14 +51,14 @@ jobs:
       run: |
         compiledb make
 
-    - name: Install make
+    - name: Install make and required build tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential
+        sudo apt-get install -y build-essential cmake
 
     - name: Configure CMake with Makefiles
       run: |
-        cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make ..
+        cmake -S . -B build -G "Unix Makefiles"  # Explicitly set Unix Makefiles generator
 
     - name: Download ShiftLeft CLI
       run: |
