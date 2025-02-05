@@ -88,9 +88,9 @@ jobs:
         compiledb make
 
     # Configure CMake with Makefiles
-    - name: Configure CMake with Makefiles
-      run: |
-        cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 ..
+    #- name: Configure CMake with Makefiles
+      #run: |
+     #  cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 ..
 
     # Download ShiftLeft CLI
     - name: Download ShiftLeft CLI
