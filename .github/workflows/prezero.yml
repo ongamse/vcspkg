@@ -31,6 +31,15 @@ jobs:
         pip install conan
         conan profile detect
 
+    # Configure Conan Remotes
+    - name: Configure Conan Remotes
+      run: |
+        conan remote list || true
+        conan remote add conancenter https://center.conan.io || true
+        conan remote add bincrafters https://bincrafters.jfrog.io/artifactory/api/conan/public-conan || true
+        conan remote update conancenter https://center.conan.io
+        conan remote update bincrafters https://bincrafters.jfrog.io/artifactory/api/conan/public-conan
+
     # Install vcpkg
     - name: Install vcpkg
       run: |
@@ -40,7 +49,7 @@ jobs:
         echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
         echo "VCPKG_DISABLE_METRICS=1" >> $GITHUB_ENV
 
-    # Ensure vcpkg.json exists (to avoid missing file error)
+    # Ensure vcpkg.json exists
     - name: Ensure vcpkg.json exists
       run: |
         if [ ! -f vcpkg.json ]; then
@@ -60,7 +69,12 @@ jobs:
         echo "fmt/10.1.1" >> conanfile.txt
         echo -e "\n[generators]\nCMakeDeps\nCMakeToolchain" >> conanfile.txt
 
-    # Run Conan Install with vcpkg dependencies
+    # Manually install missing package (vcpkg-cmake-config)
+    - name: Install vcpkg-cmake-config manually
+      run: |
+        conan install vcpkg-cmake-config/0.1@ --build=missing || echo "vcpkg-cmake-config already installed"
+
+    # Run Conan Install with all dependencies
     - name: Run Conan Install
       run: |
         conan install . --build=missing --output-folder=conan_build
