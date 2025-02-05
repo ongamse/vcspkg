@@ -82,17 +82,18 @@ jobs:
       run: |
         pip install compiledb
 
-    # Ensure correct source directory for cmake (make sure it points to your project directory)
-    #- name: Configure CMake with Makefiles
-     # run: |
-      #  mkdir build
-      #  cd build
-       # cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 ..
+    # Run CMake with the Makefile options from the root directory
+    - name: Configure and Build with CMake (using Makefile)
+      run: |
+        mkdir -p build
+        cd build
+        cmake -S ../ -B . -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14
+        cmake --build . --target release  # Call 'release' target from the Makefile
 
     # Generate Compilation Database using Make and compiledb
-    #- name: Generate Compilation Database using Make and compiledb
-      #run: |
-       # compiledb make
+    - name: Generate Compilation Database using Make and compiledb
+      run: |
+        compiledb make
 
     # Download ShiftLeft CLI
     - name: Download ShiftLeft CLI
@@ -105,7 +106,7 @@ jobs:
         ${GITHUB_WORKSPACE}/sl --version
         ${GITHUB_WORKSPACE}/sl analyze --strict --wait --verbose \
           --app C-test-App \
-          --tag branch=${{ github.head_ref }} --c .
+          --tag branch=${{ github.head_ref }} --c . -- --compilation-database compile_commands.json \
       env:
         SHIFTLEFT_ACCESS_TOKEN: ${{ secrets.SHIFTLEFT_ACCESS_TOKEN }}
         SHIFTLEFT_API_HOST: www.shiftleft.io
