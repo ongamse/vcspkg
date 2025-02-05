@@ -10,22 +10,26 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    # Set up Java JDK v11
     - name: Setup Java JDK v11
       uses: actions/setup-java@v3
       with:
         distribution: zulu
         java-version: 11
 
+    # Set up C++ environment (g++ and related tools)
+    - name: Set up C++ environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential g++ clang++ cmake
+
+    # Install Conan
     - name: Install Conan
       run: |
         pip install conan
         conan profile detect
 
-    - name: Install required build tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential cmake g++ gcc
-
+    # Install vcpkg
     - name: Install vcpkg
       run: |
         git clone https://github.com/microsoft/vcpkg.git
@@ -33,6 +37,7 @@ jobs:
         ./bootstrap-vcpkg.sh
         echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
 
+    # Generate conanfile.txt from vcpkg
     - name: Generate conanfile.txt from vcpkg
       run: |
         echo "[requires]" > conanfile.txt
@@ -41,26 +46,32 @@ jobs:
         echo "fmt/10.1.1" >> conanfile.txt
         echo -e "\n[generators]\nCMakeDeps\nCMakeToolchain" >> conanfile.txt
 
+    # Run Conan Install with vcpkg dependencies
     - name: Run Conan Install with vcpkg dependencies
       run: |
         conan install . --build=missing --output-folder=conan_build
 
+    # Install compiledb
     - name: Install compiledb
       run: |
         pip install compiledb
 
+    # Generate Compilation Database using Make and compiledb
     - name: Generate Compilation Database using Make and compiledb
       run: |
         compiledb make
 
+    # Configure CMake with Makefiles
     - name: Configure CMake with Makefiles
       run: |
         cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make ..
 
+    # Download ShiftLeft CLI
     - name: Download ShiftLeft CLI
       run: |
         curl https://cdn.shiftleft.io/download/sl > ${GITHUB_WORKSPACE}/sl && chmod a+rx ${GITHUB_WORKSPACE}/sl
 
+    # Run preZero Static Analysis
     - name: preZero Static Analysis
       run: |
         ${GITHUB_WORKSPACE}/sl --version
