@@ -51,6 +51,15 @@ jobs:
       run: |
         compiledb make
 
+    - name: Install Ninja (if you still want to install it for other cases)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build
+
+    - name: Configure CMake with Makefiles
+      run: |
+        cmake -G "Unix Makefiles" ..
+      
     - name: Download ShiftLeft CLI
       run: |
         curl https://cdn.shiftleft.io/download/sl > ${GITHUB_WORKSPACE}/sl && chmod a+rx ${GITHUB_WORKSPACE}/sl
