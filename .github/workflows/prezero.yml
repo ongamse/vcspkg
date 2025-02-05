@@ -83,12 +83,12 @@ jobs:
         pip install compiledb
 
     # Run CMake with the Makefile options from the root directory
-    - name: Configure and Build with CMake (using Makefile)
-      run: |
-        mkdir -p build
-        cd build
-        cmake -S ../ -B . -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14
-        cmake --build . --target release  # Call 'release' target from the Makefile
+    #- name: Configure and Build with CMake (using Makefile)
+     # run: |
+     #   mkdir -p build
+     #   cd build
+     #   cmake -S ../ -B . -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14
+     #   cmake --build . --target release  # Call 'release' target from the Makefile
 
     # Generate Compilation Database using Make and compiledb
     - name: Generate Compilation Database using Make and compiledb
