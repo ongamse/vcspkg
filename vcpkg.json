@@ -3,7 +3,12 @@
   "name": "myproject",
   "version-string": "0.1.0",
   "builtin-baseline": "ee2d2a100103e0f3613c60655dcf15be7d5157b8",
-  "dependencies": [],
+  "dependencies": [
+    {
+      "name": "fmt",
+      "version>=": "10.1.1"
+    }
+  ],
   "features": {
     "tests": {
       "description": "Build the tests of the package's tests",
