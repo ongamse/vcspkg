@@ -29,11 +29,13 @@ jobs:
 
     - name: Install vcpkg
       run: |
-        git clone https://github.com/microsoft/vcpkg.git
+        git clone https://github.com/microsoft/vcpkg.git 
+        chmod +x ./vcpkg/bootstrap-vcpkg.sh  # Ensure the script is executable
         ./vcpkg/bootstrap-vcpkg.sh
         echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
         # Install dependencies using vcpkg manifest mode (vcpkg.json)
         ./vcpkg install --manifest $GITHUB_WORKSPACE/vcpkg.json
+
 
     - name: Generate conanfile.txt from vcpkg
       run: |
