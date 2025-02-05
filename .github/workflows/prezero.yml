@@ -17,13 +17,13 @@ jobs:
         distribution: zulu
         java-version: 11
 
-    # Set up C++ environment (g++ and related tools)
-    - name: Set up C++ environment
+    # Set up C++ environment and dependencies
+    - name: Install C++ dependencies
       run: |
         sudo apt-get update
         sudo apt-get remove -y libopencl-clang-x.y-dev python-clang-x.y || true
         sudo apt-get install -f -y
-        sudo apt-get install -y build-essential g++ clang-14 cmake
+        sudo apt-get install -y build-essential g++ clang-14 cmake make ninja-build
 
     # Install Conan
     - name: Install Conan
@@ -38,6 +38,19 @@ jobs:
         cd vcpkg
         ./bootstrap-vcpkg.sh
         echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
+        echo "VCPKG_DISABLE_METRICS=1" >> $GITHUB_ENV
+
+    # Ensure vcpkg.json exists (to avoid missing file error)
+    - name: Ensure vcpkg.json exists
+      run: |
+        if [ ! -f vcpkg.json ]; then
+          echo '{ "name": "dummy-project", "version": "1.0", "dependencies": [] }' > vcpkg.json
+        fi
+
+    # Run vcpkg install
+    - name: Run vcpkg install
+      run: |
+        ./vcpkg/vcpkg install --triplet x64-linux
 
     # Generate conanfile.txt from vcpkg
     - name: Generate conanfile.txt from vcpkg
@@ -48,7 +61,7 @@ jobs:
         echo -e "\n[generators]\nCMakeDeps\nCMakeToolchain" >> conanfile.txt
 
     # Run Conan Install with vcpkg dependencies
-    - name: Run Conan Install with vcpkg dependencies
+    - name: Run Conan Install
       run: |
         conan install . --build=missing --output-folder=conan_build
 
@@ -65,7 +78,7 @@ jobs:
     # Configure CMake with Makefiles
     - name: Configure CMake with Makefiles
       run: |
-        cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make ..
+        cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 ..
 
     # Download ShiftLeft CLI
     - name: Download ShiftLeft CLI
