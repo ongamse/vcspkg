@@ -1,14 +1,8 @@
----
-# This workflow integrates qwiet.ai preZero with GitHub
-# Visit https://docs.shiftleft.io for help
 name: qwietaifix
 
 on:
   pull_request:
   workflow_dispatch:
-  #schedule:
-    # * is a special character in YAML so you have to quote this string
-    #- cron: '0 11 * * 6'
 
 jobs:
   NextGen-Static-Analysis:
@@ -30,19 +24,18 @@ jobs:
     - name: Install vcpkg
       run: |
         git clone https://github.com/microsoft/vcpkg.git
-        chmod +x ./vcpkg/bootstrap-vcpkg.sh  # Ensure the script is executable
-        ./vcpkg/bootstrap-vcpkg.sh          # Run the bootstrap script
+        ./vcpkg/bootstrap-vcpkg.sh
         echo "VCPKG_ROOT=$GITHUB_WORKSPACE/vcpkg" >> $GITHUB_ENV
-        # Install dependencies from manifest (no package names required)
-        ./vcpkg/vcpkg install
 
     - name: Generate conanfile.txt from vcpkg
       run: |
         echo "[requires]" > conanfile.txt
-        ./vcpkg/vcpkg list | awk '{print $1"/latest"}' >> conanfile.txt
+        ./vcpkg/vcpkg list | grep -v "fmt" | awk '{print $1"/latest"}' >> conanfile.txt
+        # Explicitly add fmt with the required version
+        echo "fmt/10.1.1" >> conanfile.txt
         echo -e "\n[generators]\nCMakeDeps\nCMakeToolchain" >> conanfile.txt
 
-    - name: Run Conan Install with vcpkg
+    - name: Run Conan Install with vcpkg dependencies
       run: |
         conan install . --build=missing --output-folder=conan_build
 
@@ -54,14 +47,14 @@ jobs:
       run: |
         compiledb make
 
-    - name: Install make, g++, and build essentials
+    - name: Install make
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake g++ gcc
+        sudo apt-get install -y build-essential
 
     - name: Configure CMake with Makefiles
       run: |
-        cmake -S . -B build -G "Unix Makefiles"  # Explicitly set Unix Makefiles generator
+        cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make ..
 
     - name: Download ShiftLeft CLI
       run: |
