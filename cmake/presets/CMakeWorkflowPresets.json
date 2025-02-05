@@ -10,7 +10,7 @@
       "name": "conf-common",
       "description": "General settings that apply to all configurations",
       "hidden": true,
-      "generator": "Ninja",
+      "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "installDir": "${sourceDir}/install/${presetName}",
       "cacheVariables": {
@@ -20,8 +20,8 @@
     {
       "name": "default",
       "displayName": "Default User Config",
-      "description": "Default build using Ninja generator",
-      "generator": "Ninja",
+      "description": "Default build using Unix Makefiles generator",
+      "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/default",
       "installDir": "${sourceDir}/install",
       "cacheVariables": {
@@ -46,9 +46,9 @@
     {
       "name": "developer",
       "inherits": "default",
-      "displayName": "Ninja Multi-Config",
-      "description": "Default build using Ninja Multi-Config generator",
-      "generator": "Ninja Multi-Config",
+      "displayName": "Unix Makefiles Multi-Config",
+      "description": "Default build using Unix Makefiles Multi-Config generator",
+      "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/developer",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
