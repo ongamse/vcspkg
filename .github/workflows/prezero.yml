@@ -59,21 +59,20 @@ jobs:
       run: |
         ./vcpkg/vcpkg install --triplet x64-linux
 
-    # Generate conanfile.txt from vcpkg
-    - name: Generate conanfile.txt from vcpkg
+    # Generate conanfile.txt with a hardcoded fmt version
+    - name: Generate conanfile.txt
       run: |
         echo "[requires]" > conanfile.txt
-        ./vcpkg/vcpkg list | awk '{print $1"/latest"}' >> conanfile.txt
-        echo "fmt/10.1.1" >> conanfile.txt
+        echo "fmt/10.1.1" >> conanfile.txt  # Pin fmt to version 10.1.1
         echo -e "\n[generators]\nCMakeDeps\nCMakeToolchain" >> conanfile.txt
 
-    # Install missing package (vcpkg-cmake-config) from conancenter
+    # Install vcpkg-cmake-config manually
     - name: Install vcpkg-cmake-config manually
       run: |
         conan search vcpkg-cmake-config -r=conancenter || echo "Package not found in remote."
         conan install vcpkg-cmake-config/0.1@ --build=missing -r=conancenter || echo "Skipping package install."
 
-    # Run Conan Install with all dependencies
+    # Run Conan Install with pinned dependencies
     - name: Run Conan Install
       run: |
         conan install . --build=missing --output-folder=conan_build -r=conancenter
