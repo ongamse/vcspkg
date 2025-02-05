@@ -83,26 +83,26 @@ jobs:
         pip install compiledb
 
     # Configure CMake with Makefiles
-    - name: Configure CMake
-      run: |
-        mkdir -p build
-        cd build
-        cmake -S ../ -B . -G "Unix Makefiles" \
-          -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
-          -DCMAKE_C_COMPILER=clang-14 \
-          -DCMAKE_CXX_COMPILER=clang++-14 \
-          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON  # ✅ Enables compile_commands.json
+    #- name: Configure CMake
+     # run: |
+      #  mkdir -p build
+       # cd build
+        #cmake -S ../ -B . -G "Unix Makefiles" \
+         # -DCMAKE_MAKE_PROGRAM=/usr/bin/make \
+          #-DCMAKE_C_COMPILER=clang-14 \
+          #-DCMAKE_CXX_COMPILER=clang++-14 \
+          #-DCMAKE_EXPORT_COMPILE_COMMANDS=ON  # ✅ Enables compile_commands.json
 
     # Build using Make (to match your Makefile)
-    - name: Build with Make
-      run: |
-        cd build
-        make release  # Calls the 'release' target in Makefile
+    #- name: Build with Make
+     # run: |
+      #  cd build
+       # make release  # Calls the 'release' target in Makefile
 
     # Generate compilation database using compiledb
     - name: Generate Compilation Database
       run: |
-        cd build
+        #cd build
         compiledb make  # ✅ Explicitly generate compile_commands.json
 
     # Move compile_commands.json to root (if necessary)
