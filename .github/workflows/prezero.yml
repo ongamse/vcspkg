@@ -91,9 +91,9 @@ jobs:
      #   cmake --build . --target release  # Call 'release' target from the Makefile
 
     # Generate Compilation Database using Make and compiledb
-    - name: Generate Compilation Database using Make and compiledb
-      run: |
-        compiledb make
+    #- name: Generate Compilation Database using Make and compiledb
+    #  run: |
+      #  compiledb make
 
     # Download ShiftLeft CLI
     - name: Download ShiftLeft CLI
