@@ -82,15 +82,15 @@ jobs:
       run: |
         pip install compiledb
 
-    # Generate Compilation Database using Make and compiledb
+    # Configure CMake with Makefiles (Moved **before** generating compilation database)
+    - name: Configure CMake with Makefiles
+      run: |
+        cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 ..
+
+    # Generate Compilation Database using Make and compiledb (Moved **after** CMake configuration)
     - name: Generate Compilation Database using Make and compiledb
       run: |
         compiledb make
-
-    # Configure CMake with Makefiles
-    #- name: Configure CMake with Makefiles
-      #run: |
-     #  cmake -G "Unix Makefiles" -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 ..
 
     # Download ShiftLeft CLI
     - name: Download ShiftLeft CLI
