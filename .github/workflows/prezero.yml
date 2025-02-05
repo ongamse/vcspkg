@@ -100,10 +100,10 @@ jobs:
        # make release  # Calls the 'release' target in Makefile
 
     # Generate compilation database using compiledb
-    - name: Generate Compilation Database
-      run: |
-        #cd build
-        compiledb make  # ✅ Explicitly generate compile_commands.json
+    #- name: Generate Compilation Database
+     # run: |
+      #  #cd build
+      #  compiledb make  # ✅ Explicitly generate compile_commands.json
 
     # Move compile_commands.json to root (if necessary)
     #- name: Move Compilation Database
